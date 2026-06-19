@@ -24,6 +24,19 @@ from services.payment_service import PaymentService
 
 from models.transaction import Transaction
 
+fraud_detector = FraudDetector()
+
+daily_limit_service = DailyLimitService()
+
+account_service = AccountService()
+
+bank = BankSimulator()
+
+breaker = CircuitBreaker()
+
+metrics = Metrics()
+
+event_bus = EventBus()
 
 def on_payment_success(data):
 
@@ -221,3 +234,16 @@ def main():
 if __name__ == "__main__":
 
     main()
+fraud_detector = FraudDetector()
+
+daily_limit_service = DailyLimitService()
+
+account_service = AccountService()
+
+bank = BankSimulator()
+
+breaker = CircuitBreaker()
+
+metrics = Metrics()
+
+event_bus = EventBus()

@@ -13,7 +13,13 @@ class PaymentService:
 
         event_bus,
 
-        metrics
+        metrics,
+
+        fraud_detector,
+
+        daily_limit_service,
+
+        account_service
 
     ):
 
@@ -24,6 +30,12 @@ class PaymentService:
         self.event_bus = event_bus
 
         self.metrics = metrics
+    
+        self.fraud = fraud_detector
+
+        self.daily_limit = daily_limit_service
+
+        self.account_service = account_service
 
     def pay(
 
@@ -34,16 +46,37 @@ class PaymentService:
     ):
 
         start = time.time()
-
+        money_withdrawn = False
         try:
+            self.fraud.check(
 
+                    transaction
+
+                    )
+
+            self.daily_limit.check(
+
+                 transaction
+
+                    )
+
+            self.account_service.withdraw(
+
+                    transaction.username,
+
+                    transaction.amount
+
+                    )
+            money_withdrawn = True
             response = self.breaker.call(
 
-                self.bank.process_payment,
+            self.bank.process_payment,
 
-                transaction
+            transaction
 
-            )
+                )
+        
+
 
             latency = (
 
@@ -78,6 +111,12 @@ class PaymentService:
             return response
 
         except Exception:
+
+            if money_withdrawn:
+                self.account_service.deposit(
+                        transaction.username,
+                        transaction.amount
+                        )
 
             latency = (
 
