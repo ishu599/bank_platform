@@ -24,6 +24,13 @@ from services.payment_service import PaymentService
 
 from models.transaction import Transaction
 
+from services.fraud_detection import FraudDetector
+
+from services.daily_limit_service import DailyLimitService
+
+from services.account_service import AccountService
+
+
 fraud_detector = FraudDetector()
 
 daily_limit_service = DailyLimitService()
@@ -118,7 +125,13 @@ def main():
 
         event_bus,
 
-        metrics
+        metrics,
+
+        fraud_detector,
+
+        daily_limit_service,
+
+        account_service
 
     )
 
@@ -137,7 +150,7 @@ def main():
         on_payment_failure
 
     )
-
+    
     request_id = "req-001"
 
     username = "raghu"
@@ -185,7 +198,13 @@ def main():
         tokens
 
     )
+    account_service.create_account(
 
+    username,
+
+    100000
+
+    )
     transaction = Transaction(
 
         transaction_id=1,
@@ -232,18 +251,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
-fraud_detector = FraudDetector()
-
-daily_limit_service = DailyLimitService()
-
-account_service = AccountService()
-
-bank = BankSimulator()
-
-breaker = CircuitBreaker()
-
-metrics = Metrics()
-
-event_bus = EventBus()
