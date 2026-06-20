@@ -1,5 +1,8 @@
 import time
-
+from observability.prometheus_metrics import REQUEST_COUNT
+from observability.prometheus_metrics import PAYMENT_SUCCESS
+from observability.prometheus_metrics import PAYMENT_FAILURE
+from observability.prometheus_metrics import PAYMENT_LATENCY
 
 class PaymentService:
 
@@ -44,7 +47,7 @@ class PaymentService:
         transaction
 
     ):
-
+        REQUEST_COUNT.inc()
         start = time.time()
         money_withdrawn = False
         try:
@@ -101,7 +104,9 @@ class PaymentService:
                 latency
 
             )
+            PAYMENT_SUCCESS.inc()
 
+            PAYMENT_LATENCY.observe(latency)
             self.event_bus.publish(
 
                 "payment_success",
@@ -149,7 +154,9 @@ class PaymentService:
                 latency
 
             )
+            PAYMENT_FAILURE.inc()
 
+            PAYMENT_LATENCY.observe(latency)
             self.event_bus.publish(
 
                 "payment_failure",

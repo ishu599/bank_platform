@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from system.container import container
+from fastapi.responses import PlainTextResponse
 
+from prometheus_client import generate_latest
 
 router = APIRouter()
 
@@ -14,8 +15,8 @@ router = APIRouter()
 
 def metrics():
 
-    return (
+    return PlainTextResponse(
 
-        container.metrics.get_metrics()
+        generate_latest().decode()
 
     )
