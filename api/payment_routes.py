@@ -7,7 +7,9 @@ from system.container import container
 from schemas.payment_schema import PaymentRequest
 
 from models.transaction import Transaction
+from fastapi import Depends
 
+from middleware.auth_middleware import verify_token
 
 router = APIRouter()
 
@@ -23,7 +25,13 @@ transaction_counter = 1
 
 def pay(
 
-    request: PaymentRequest
+    request: PaymentRequest,
+
+    user = Depends(
+
+        verify_token
+
+    )
 
 ):
 
@@ -42,7 +50,11 @@ def pay(
         )
 
         transaction_counter += 1
+        container.rate_limiter.check(
 
+        request.username
+
+        )
         response = container.payment_service.pay(
 
             transaction

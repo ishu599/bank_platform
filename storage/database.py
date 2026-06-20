@@ -41,6 +41,28 @@ class Database:
 
         self.create_audit_logs_table()
 
+        self.create_transactions_table()
+
+    def create_transactions_table(self):
+
+        self.cursor.execute(
+    """
+    CREATE TABLE IF NOT EXISTS transactions(
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        username TEXT,
+
+        amount REAL,
+
+        status TEXT,
+
+        created_at TEXT
+
+    )
+    """
+    )
+        self.connection.commit()
     def create_users_table(self):
 
         self.cursor.execute(
@@ -109,7 +131,7 @@ class Database:
         )
 
         self.connection.commit()
-
+    
     def close(self):
 
         self.connection.close()

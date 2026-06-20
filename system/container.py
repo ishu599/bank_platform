@@ -2,7 +2,7 @@ from storage.database import Database
 
 from repositories.user_repository import UserRepository
 from repositories.refresh_token_repository import RefreshTokenRepository
-
+from repositories.transaction_repository import TransactionRepository
 from observability.audit_logger import AuditLogger
 from observability.metrics import Metrics
 
@@ -20,6 +20,11 @@ from services.fraud_detection import FraudDetector
 from services.daily_limit_service import DailyLimitService
 
 from events.event_bus import EventBus
+from middleware.rate_limiter import RateLimiter
+
+from services.cache_service import CacheService
+
+
 
 
 class Container:
@@ -39,7 +44,9 @@ class Container:
         self.bank = BankSimulator()
 
         self.account_service = AccountService()
+        self.rate_limiter = RateLimiter()
 
+        self.cache_service = CacheService()
         self.account_service.create_account(
 
     "raghu",
@@ -50,7 +57,7 @@ class Container:
         self.fraud_detector = FraudDetector()
 
         self.daily_limit_service = DailyLimitService()
-
+        self.transaction_repository = TransactionRepository(self.database)
         self.user_repository = UserRepository(
 
             self.database

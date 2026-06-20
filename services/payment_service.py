@@ -75,7 +75,15 @@ class PaymentService:
             transaction
 
                 )
-        
+            self.transaction_repository.save(
+
+    transaction.username,
+
+    transaction.amount,
+
+    "SUCCESS"
+
+)
 
 
             latency = (
@@ -127,7 +135,15 @@ class PaymentService:
                 start
 
             )
+            self.transaction_repository.save(
 
+    transaction.username,
+
+    transaction.amount,
+
+    "FAILED"
+
+)
             self.metrics.record_failure(
 
                 latency
