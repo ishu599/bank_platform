@@ -2,122 +2,199 @@ class AccountService:
 
     def __init__(
 
-        self
+        self,
+
+        repository,
+
+        redis
 
     ):
 
-        self.accounts = {}
+        self.repository = repository
+
+        self.redis = redis
 
     def create_account(
 
-        self,
+    self,
+
+    username,
+
+    balance
+
+        ):
+        account = self.repository.find(
+
+        username
+
+    )
+
+        if account:
+
+            raise Exception(
+
+            "Account already exists"
+
+        )
+
+        self.repository.create(
 
         username,
 
         balance
 
-    ):
-
-        if username in self.accounts:
-
-            raise Exception(
-
-                "Account already exists"
-
-            )
-
-        self.accounts[username] = balance
+    )
 
         return True
 
     def get_balance(
 
-        self,
+    self,
+
+    username
+
+):
+
+        cache_key = f"account:{username}"
+
+        cached = self.redis.get(
+
+        cache_key
+
+    )
+
+        if cached:
+
+            return float(
+
+            cached
+
+        )
+
+        account = self.repository.find(
 
         username
 
-    ):
+    )
 
-        if username not in self.accounts:
+        if not account:
 
             raise Exception(
 
-                "Account not found"
+            "Account not found"
 
-            )
+        )
 
-        return self.accounts[username]
+        balance = account["balance"]
+
+        self.redis.set(
+
+        cache_key,
+
+        balance,
+
+        ttl=300
+
+    )
+
+        return balance
 
     def withdraw(
 
-        self,
+    self,
 
-        username,
+    username,
 
-        amount
+    amount
 
-    ):
-
-        if username not in self.accounts:
-
-            raise Exception(
-
-                "Account not found"
-
-            )
+):
 
         if amount <= 0:
 
             raise Exception(
 
-                "Invalid amount"
+            "Invalid amount"
 
-            )
+        )
 
-        balance = self.accounts[username]
+        balance = self.get_balance(
+
+            username
+
+    )
 
         if balance < amount:
 
             raise Exception(
 
-                "Insufficient funds"
-
-            )
-
-        self.accounts[username] = (
-
-            balance - amount
+            "Insufficient funds"
 
         )
+
+        new_balance = (
+
+        balance - amount
+
+    )
+
+        self.repository.update_balance(
+
+        username,
+
+        new_balance
+
+    )
+
+        self.redis.delete(
+
+        f"account:{username}"
+
+    )
 
         return True
 
     def deposit(
 
-        self,
+    self,
 
-        username,
+    username,
 
-        amount
+    amount
 
-    ):
-
-        if username not in self.accounts:
-
-            raise Exception(
-
-                "Account not found"
-
-            )
+):
 
         if amount <= 0:
 
             raise Exception(
 
-                "Invalid amount"
+            "Invalid amount"
 
-            )
+        )
 
-        self.accounts[username] += amount
+        balance = self.get_balance(
+
+        username
+
+    )
+
+        new_balance = (
+
+        balance + amount
+
+    )
+
+        self.repository.update_balance(
+
+        username,
+
+        new_balance
+
+    )
+
+        self.redis.delete(
+
+        f"account:{username}"
+
+    )
 
         return True

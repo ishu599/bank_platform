@@ -5,14 +5,14 @@ from repositories.refresh_token_repository import RefreshTokenRepository
 from repositories.transaction_repository import TransactionRepository
 from observability.audit_logger import AuditLogger
 from observability.metrics import Metrics
-
+from services.redis_service import RedisService
 from security.jwt_manager import JWTManager
 from security.token_manager import TokenManager
 
 from system.circuit_breaker import CircuitBreaker
 
 from bank.bank_simulator import BankSimulator
-
+from repositories.account_repository import AccountRepository
 from services.auth_service import AuthService
 from services.account_service import AccountService
 from services.payment_service import PaymentService
@@ -32,8 +32,29 @@ class Container:
     def __init__(self):
 
         self.database = Database()
+        
+        self.redis = RedisService()
+        self.account_repository = AccountRepository(
 
-        self.database.initialize()
+    self.database
+
+)
+
+
+        self.account_repository = AccountRepository(
+
+    self.database
+
+)
+
+        self.account_service = AccountService(
+
+    self.account_repository,
+
+    self.redis
+
+)
+       
 
         self.metrics = Metrics()
 
@@ -43,21 +64,17 @@ class Container:
 
         self.bank = BankSimulator()
 
-        self.account_service = AccountService()
+        
         self.rate_limiter = RateLimiter()
-
+        self.redis = RedisService()
         self.cache_service = CacheService()
-        self.account_service.create_account(
-
-    "raghu",
-
-    100000
-
-)
+       
         self.fraud_detector = FraudDetector()
 
         self.daily_limit_service = DailyLimitService()
-        self.transaction_repository = TransactionRepository(self.database)
+        self.transaction_repository = TransactionRepository(
+    self.database
+)
         self.user_repository = UserRepository(
 
             self.database
@@ -108,7 +125,9 @@ class Container:
 
             self.daily_limit_service,
 
-            self.account_service
+            self.account_service,
+
+            self.transaction_repository
 
         )
 

@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: bank-platform
+
+spec:
+
+  replicas: 2
+
+  selector:
+
+    matchLabels:
+
+      app: bank-platform
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: bank-platform
+
+    spec:
+
+      containers:
+
+      - name: bank-platform
+
+        image: bank-platform
+
+        imagePullPolicy: Never
+
+        ports:
+
+        - containerPort: 8000
+
+        resources:
+
+          requests:
+
+            cpu: "100m"
+
+            memory: "256Mi"
+
+          limits:
+
+            cpu: "500m"
+
+            memory: "512Mi"
+
+        env:
+
+        - name: DB_HOST
+
+          valueFrom:
+
+            configMapKeyRef:
+
+              name: db-config
+
+              key: DB_HOST
+
+        - name: DB_PORT
+
+          valueFrom:
+
+            configMapKeyRef:
+
+              name: db-config
+
+              key: DB_PORT
+
+        - name: DB_NAME
+
+          valueFrom:
+
+            configMapKeyRef:
+
+              name: db-config
+
+              key: DB_NAME
+
+        - name: DB_USER
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: db-secret
+
+              key: DB_USER
+
+        - name: DB_PASSWORD
+
+          valueFrom:
+
+            secretKeyRef:
+
+              name: db-secret
+
+              key: DB_PASSWORD
+
+        livenessProbe:
+
+          httpGet:
+
+            path: /health
+
+            port: 8000
+
+          initialDelaySeconds: 15
+
+          periodSeconds: 10
+
+        readinessProbe:
+
+          httpGet:
+
+            path: /ready
+
+            port: 8000
+
+          initialDelaySeconds: 10
+
+          periodSeconds: 5

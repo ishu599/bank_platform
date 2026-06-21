@@ -22,7 +22,9 @@ class PaymentService:
 
         daily_limit_service,
 
-        account_service
+        account_service,
+
+        transaction_repository
 
     ):
 
@@ -39,6 +41,8 @@ class PaymentService:
         self.daily_limit = daily_limit_service
 
         self.account_service = account_service
+
+        self.transaction_repository = transaction_repository
 
     def pay(
 
@@ -78,6 +82,8 @@ class PaymentService:
             transaction
 
                 )
+            
+                      
             self.transaction_repository.save(
 
     transaction.username,

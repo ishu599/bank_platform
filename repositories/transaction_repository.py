@@ -47,13 +47,13 @@ class TransactionRepository:
 
             VALUES(
 
-                ?,
+                %s,
 
-                ?,
+                %s,
 
-                ?,
+                %s,
 
-                ?
+                %s
 
             )
 
@@ -95,7 +95,7 @@ class TransactionRepository:
 
             FROM transactions
 
-            WHERE username=?
+            WHERE username=%s
 
             ORDER BY id DESC
 
@@ -109,14 +109,30 @@ class TransactionRepository:
 
         )
 
+        rows = cursor.fetchall()
+
+        columns = [
+
+            desc[0]
+
+            for desc in cursor.description
+
+        ]
+
         return [
 
             dict(
 
-                row
+                zip(
+
+                    columns,
+
+                    row
+
+                )
 
             )
 
-            for row in cursor.fetchall()
+            for row in rows
 
         ]

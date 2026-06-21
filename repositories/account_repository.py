@@ -1,4 +1,4 @@
-class UserRepository:
+class AccountRepository:
 
     def __init__(
 
@@ -10,15 +10,13 @@ class UserRepository:
 
         self.database = database
 
-    def create_user(
+    def create(
 
         self,
 
         username,
 
-        password_hash,
-
-        role
+        balance
 
     ):
 
@@ -30,19 +28,15 @@ class UserRepository:
 
             """
 
-            INSERT INTO users(
+            INSERT INTO accounts(
 
                 username,
 
-                password_hash,
-
-                role
+                balance
 
             )
 
             VALUES(
-
-                %s,
 
                 %s,
 
@@ -56,9 +50,7 @@ class UserRepository:
 
                 username,
 
-                password_hash,
-
-                role
+                balance
 
             )
 
@@ -66,7 +58,9 @@ class UserRepository:
 
         connection.commit()
 
-    def find_user(
+        cursor.close()
+
+    def find(
 
         self,
 
@@ -84,7 +78,7 @@ class UserRepository:
 
             SELECT *
 
-            FROM users
+            FROM accounts
 
             WHERE username=%s
 
@@ -110,6 +104,8 @@ class UserRepository:
 
             ]
 
+            cursor.close()
+
             return dict(
 
                 zip(
@@ -122,13 +118,17 @@ class UserRepository:
 
             )
 
+        cursor.close()
+
         return None
 
-    def delete_user(
+    def update_balance(
 
         self,
 
-        username
+        username,
+
+        balance
 
     ):
 
@@ -140,7 +140,9 @@ class UserRepository:
 
             """
 
-            DELETE FROM users
+            UPDATE accounts
+
+            SET balance=%s
 
             WHERE username=%s
 
@@ -148,10 +150,14 @@ class UserRepository:
 
             (
 
-                username,
+                balance,
+
+                username
 
             )
 
         )
 
         connection.commit()
+
+        cursor.close()

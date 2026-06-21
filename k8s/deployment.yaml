@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: bank-platform
+
+spec:
+
+  replicas: 2
+
+  selector:
+
+    matchLabels:
+
+      app: bank-platform
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: bank-platform
+
+    spec:
+
+      containers:
+
+      - name: bank-platform
+
+        image: bank-platform:latest
+
+        imagePullPolicy: Never
+
+        ports:
+
+        - containerPort: 8000
+
+        env:
+
+        - name: POSTGRES_HOST
+
+          value: postgres
+
+        - name: POSTGRES_PORT
+
+          value: "5432"
+
+        - name: POSTGRES_DB
+
+          value: bankdb
+
+        - name: POSTGRES_USER
+
+          value: postgres
+
+        - name: POSTGRES_PASSWORD
+
+          value: password
